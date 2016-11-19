@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+<link rel="stylesheet" type="text/css" href="css-SE/new_css-SE.css"/>
+</HEAD>
+<BODY>
+<script type ="text/javascript" src="https://www.google.com/jsapi"></script>
+ <script type="text/javascript">
+ 
+ google.load('visualization','1.0',{'packages':['corechart']});
+ google.setOnLoadCallback(grafico);
+ 
+ function revisar(){
+ var str = document.getElementById("area").value;
+ var diezpalabras = new Array(10); 
+ str = str.toLowerCase();
+ var strg = str.replace(/[,:;.!¡¿?%"0123456789-]/gi, "");
+ var res = strg.split(" ");
+ var conectores = ["","a","por","los","de","ser","tu","estoy","esa","ha","te","has","que","la","su","con","también","es","está","lo","fue","sobre","nuestras",
+ "al","esta","el","nos","las","un","se","han","tan","una","cuando","todos","y","en","incluso","hasta","para","del","más","sido","mi","sus","les","o","este",
+ "porque","me","son","muy",];
+ var palabras = new Array();
+ var conteo = new Array(); 
+
+	//en estos ciclos se eliminan los conectores del vector res
+	for(z=0;z<res.length;z++){
+		for( i = 0 ; i < conectores.length; i++){
+			if (res[z] ==  conectores[i])				
+				res.splice(z,1);
+		}
+		for( i = 0 ; i < conectores.length; i++){
+			if (res[z] ==  conectores[i])				
+				res.splice(z,1);
+		}
+		
+		//en este ciclo se almacenan los elementos de res en el vector palabras que (segun la condicional) se repiten, y también se cuentan 
+		for( y = 0 ; y < res.length ; y++){ 
+			if (palabras[y] ==  null){
+				palabras[y] = res[z];
+				conteo[y] = 1;
+				break;
+			}
+			else if (res[z] == palabras[y]){
+				conteo[y]++;
+				break;
+			}
+		}
+	}
+	//Ordenamiento: en los siguientes ciclos se ordenan los vectores; palabras y conteo, de mayor a menor 
+	//recorreremos todos los elementos hasta n-1
+    for(i=0;i<(conteo.length-1);i++){
+    //recorreremos todos los elementos hasta n-i, tomar en cuenta los ultimos no tiene caso ya que ya estan acomodados.
+		for(j=0;j<(conteo.length-i);j++){
+ 
+        //comparamos
+			if(conteo[j]<conteo[j+1]){
+				//guardamos el numero mayor en el auxiliar
+				aux=conteo[j];
+				aux2=palabras[j];
+				//guardamos el numero menor en el lugar correspondiente
+				conteo[j]=conteo[j+1];
+				palabras[j]=palabras[j+1];
+				//asignamos el auxiliar en el lugar correspondiente
+				conteo[j+1]=aux;
+				palabras[j+1]=aux2;
+			}
+        }
+    }
+	//el siguiente vector toma las 10 primeros elementos del vector palabras y los ingresa en el vector diezpalabras 
+	for (t = 0; t < 10; t++){
+		diezpalabras[t]=palabras[t];
+		/*for (e = 0; e < res.length; e++){
+			diezpalabras[t]=res[t];
+	
+	}*/
+	}
+
+	document.getElementById("em").innerHTML = "El conteo ordenado es el siguiente:	"+ conteo+'\n';
+	document.getElementById("t").innerHTML = "Las diez palabras con más peso son:...................."+ diezpalabras+'\n';
+
+//se genera el histograma de forma grafica 	
+ var data = new google.visualization.DataTable();
+
+	data.addColumn('string','palabras');
+	data.addColumn('number','total');
+	for(r = 0 ; r < diezpalabras.length ; r++ ){
+		
+		data.addRows([["'"+diezpalabras[r]+"'",conteo[r]]]);
+	}
+	var propiedades = {'title':'Histograma','width':500,'height':300};
+	var grafica = new google.visualization.Histogram(document.getElementById('divgra'));
+	grafica.draw(data,propiedades);
+
+}
+ </script>
+<FORM ID="formulario" ACTION="#">
+<TEXTAREA ID="area" COLS=80 ROWS=10>
+Ingresa tu discurso a revisar...</TEXTAREA><BR>
+<button onclick="revisar()">Revisar</button>
+</FORM>
+<p id = "em"></p>
+<p id = "t"></p>
+<div id = "divgra"></div>
+</BODY>
+</HTML>
